@@ -1,6 +1,8 @@
 
 #include "includes/class/cli.hpp"
 
+#include <cstring>
+#include <exception>
 #include <iostream>
 
 /*
@@ -15,5 +17,18 @@ int main(int argc, char **argv)
 {
 	cli	c(argc, argv);
 
-	c.checkArguments();
+	try
+	{
+		c.checkArguments();
+		c.run();
+	}
+	catch (cli::cliError &ex)
+	{
+		std::cerr << basename(argv[0]) << ": " <<  ex.what() << std::endl;
+		c.help();
+	}
+	catch (std::exception &ex)
+	{
+		std::cerr << basename(argv[0]) << ": " <<  ex.what() << std::endl;
+	}
 }

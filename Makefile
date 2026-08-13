@@ -1,10 +1,10 @@
 NAME		:=	midona
 
 COMPILER	:=	g++
-FLAGS		:=	-Wall -Wextra -c -I.
+FLAGS		:=	-Wall -Wextra -c -I. -std=c++11
 
 ifdef DEBUG
-FLAGS		+= -g3
+FLAGS		+= -g3 -DDEBUG
 else
 FLAGS		+= -O3
 endif
