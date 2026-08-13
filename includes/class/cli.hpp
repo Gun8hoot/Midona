@@ -45,5 +45,6 @@ class	cli
 
 		void		help(void) const noexcept;
 		void		checkArguments(void);
+		void		sortArguments(void);
 		void		run(void);
 };
