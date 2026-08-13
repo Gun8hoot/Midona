@@ -125,4 +125,5 @@ void	cli::run(void)
 		cli::compress();
 	if (this->isFlagged(MIDONA_ENCRYPT))
 		cli::encrypt();
+	this->_io.closeFile();
 }

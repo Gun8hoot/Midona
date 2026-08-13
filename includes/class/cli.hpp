@@ -1,6 +1,9 @@
 
 #pragma once
 
+#include "includes/class/io.hpp"
+
+
 #include <exception>
 #include <iostream>
 #include <cstring>
@@ -22,6 +25,7 @@ class	cli
 		char		**&_argv;
 		int			_flags;
 		std::string	_filepath;
+		IO			_io;
 
 		void		version(void) const noexcept;
 		void		compress(void) const;

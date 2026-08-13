@@ -6,3 +6,5 @@
 # define EUNKNOWN_FLAG "Unknown parameter "
 # define EUSERNAME "Failed to get the current username"
 # define EEMPTY_C_STR "Caught an"
+# define EOPEN_FILE "Failed to open "
+# define ECLOSE_FILE "Failed to close "
