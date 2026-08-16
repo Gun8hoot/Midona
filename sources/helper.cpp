@@ -1,10 +1,16 @@
 
 #include "includes/helper.hpp"
+#include "includes/error.hpp"
 #include <stdexcept>
 #include <sys/types.h>
 #include <unistd.h>
 #include <pwd.h>
 
+/*
+ * @brief: This function remove white space at the beginning and the end of the string
+ * @param:
+ *   str = Reference to the string we want trim
+ */
 std::string	&helper::trim(std::string &str)
 {
 	std::size_t	size = str.size();
@@ -22,7 +28,11 @@ std::string	&helper::trim(std::string &str)
 		str.erase(0, first);
 	return (str);
 }
-
+/*
+ * @brief: This function remove white space at the beginning and the end of the string
+ * @param:
+ *   str = The string we want trim
+ */
 std::string	helper::trim(const char *c_str)
 {
 	std::string str;
@@ -48,17 +58,21 @@ std::string	helper::trim(const char *c_str)
 		str.erase(0, first);
 	return (str);
 }
-
+/*
+ * @brief: This function give the username of the user by using his uid
+ */
 static	const std::string	get_username(void)
 {
 	uid_t	uid = getuid();
 	passwd	*data = getpwuid(uid);
 
 	if (!data || !data->pw_name)
-		throw (std::runtime_error("Failed current user name"));
+		throw (std::runtime_error(EUSERNAME));
 	return (std::string(data->pw_name));
 }
-
+/*
+ * @brief: This function expand the tilde (~) operator on a file path
+ */
 std::string	&helper::expand(std::string &str)
 {
 	const std::string username = get_username();

@@ -1,12 +1,12 @@
 
 #pragma once
 
-#include "includes/class/io.hpp"
-
+#include "includes/io/io.hpp"
 
 #include <exception>
 #include <iostream>
 #include <cstring>
+#include <inttypes.h>
 
 #define VERSION "1.0.0"
 
@@ -16,6 +16,8 @@ enum	cliFlags
 	MIDONA_HELP = 1 << 1,
 	MIDONA_COMPRESS = 1 << 2,
 	MIDONA_ENCRYPT = 1 << 3,
+	MIDONA_PROGRESS = 1 << 4,
+	MIDONA_OUTFILE = 1 << 5,
 };
 
 class	cli
@@ -23,8 +25,9 @@ class	cli
 	private:
 		int			&_argc;
 		char		**&_argv;
-		int			_flags;
-		std::string	_filepath;
+		uint8_t		_flags;
+		std::string	_infile;
+		std::string	_outfile;
 		IO			_io;
 
 		void		version(void) const noexcept;
@@ -49,6 +52,6 @@ class	cli
 
 		void		help(void) const noexcept;
 		void		checkArguments(void);
-		void		sortArguments(void);
+		void		assignFlag(void);
 		void		run(void);
 };

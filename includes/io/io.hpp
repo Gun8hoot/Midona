@@ -19,4 +19,5 @@ class	IO
 
 		const std::fstream	&openFile(std::string &filepath, std::ios::openmode mode);
 		void				closeFile(void) noexcept;
+		static bool			checkFile(const std::string &str);
 };

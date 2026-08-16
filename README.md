@@ -15,6 +15,12 @@
 Midona is a [runtime packer](https://en.wikipedia.org/wiki/Executable_compression) that can both compress and/or encrypt an linux [ELF executable](https://en.wikipedia.org/wiki/Executable_and_Linkable_Format). The decompression and decryption will be completely done at the runtime in memory without leaving any persistant (???) on the disk.
 
 <div align="center">
+	<h1>Technical description : </h1>
+</div>
+
+The program is written in **C++11**, without including any external library other than C++ standard lib and glibc. To compress data, i have chosen **LZ4** because it is pretty well documented and i find that this compression algorithm has a good ratio between compression and speed. For the encryption i will probably use **AES256-GCM** to get both confidentiality and authenticity. The compression and encryption is done on a single thread so it can take a lot of time depending of size of the content.
+
+<div align="center">
 	<h1>Usage : </h1>
 </div>
 
@@ -33,6 +39,10 @@ make
 ```
 
 <div align="center">
+	<h1>Known issues : </h1>
+</div>
+
+<div align="center">
 	<h1>Roadmap : </h1>
 </div>
 
@@ -40,9 +50,9 @@ Done at : ~3%
 
 - [ ] : Create the best program i can do with the maximum of quality
 - [x] : Parse arguments with their corresponding flags
-	- [ ] : (optional) Add -o flag to know where the compressed/encrypted executable should be placed/named
+	- [x] : (optional) Add -o flag to know where the compressed/encrypted executable should be placed/named
 - [ ] : Being able to compress data
-	- [ ] : Choose a good compression algorithm
+	- [x] : Choose a good compression algorithm
 	- [ ] : Implement the algorithm
 - [ ] : Being able to encrypt data
 	- [ ] : Implement AES256
@@ -59,3 +69,4 @@ Done at : ~3%
 - [How ELF work part.2](https://aleeamini.com/elfs-story-part2/) <sup>[[mirror]](https://web.archive.org/web/20260721165025/https://aleeamini.com/elfs-story-part2-elf-structure-elf-header/)</sup>
 - [How ELF work part.3](https://aleeamini.com/elfs-story-part3/) <sup>[[mirror]](https://web.archive.org/web/20260721165326/https://aleeamini.com/elfs-story-part3-elfs-structure-elf-section-headers/)</sup>
 - [Executing ELF in memory](https://towardsdev.com/memfd-create-fileless-execution-linux-elf-in-memory-28422d6bcbef)
+- [LZ4 Algorithm](https://deepwiki.com/lz4/lz4/6.2-lz4-frame-format) <sup>[[mirror]](https://web.archive.org/web/20260324072508/https://deepwiki.com/lz4/lz4/6.2-lz4-frame-format)</sup>
