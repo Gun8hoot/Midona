@@ -27,16 +27,16 @@ cli::~cli(void) { ; }
 void cli::help(void) const noexcept
 {
 	/* https://bettercli.org/design/cli-help-page/ */
-	std::cerr << "Description:" << std::endl;
-	std::cerr << "    Midona " << VERSION << ", a runtime compression and encryption packer." << std::endl;
-	std::cerr << "Usage: " << basename(this->_argv[0]) << " [FLAGS]... [FILE]" << std::endl;
-	std::cerr << "    -c/--compress : Compress the binary" << std::endl;
-	std::cerr << "    -e/--encrypt : Encrypt the binary" << std::endl;
-	std::cerr << "    -b/--both : Compress and encrypt the binary" << std::endl;
-	std::cerr << "    -o/--out : The location of the compressed/encrypted binary" << std::endl;
-	std::cerr << "    -p/--progress : A progress bar will be display" << std::endl;
-	std::cerr << "    -h/--help : Display this message" << std::endl;
-	std::cerr << "    -v/--version : Display the version of the software" << std::endl;
+	std::cout << "Description:" << std::endl;
+	std::cout << "    Midona " << VERSION << ", a runtime compression and encryption packer." << std::endl;
+	std::cout << "Usage: " << basename(this->_argv[0]) << " [FLAGS]... [FILE]" << std::endl;
+	std::cout << "    -c/--compress : Compress the binary" << std::endl;
+	std::cout << "    -e/--encrypt : Encrypt the binary" << std::endl;
+	std::cout << "    -b/--both : Compress and encrypt the binary" << std::endl;
+	std::cout << "    -o/--out : The location of the compressed/encrypted binary" << std::endl;
+	std::cout << "    -p/--progress : A progress bar will be display" << std::endl;
+	std::cout << "    -h/--help : Display this message" << std::endl;
+	std::cout << "    -v/--version : Display the version of the software" << std::endl;
 }
 /*
  * @brief: This function display the actual version of the program

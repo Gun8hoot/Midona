@@ -1,7 +1,7 @@
 NAME		:=	midona
 
 COMPILER	:=	g++
-FLAGS		:=	-Wall -Wextra -c -I. -std=c++11
+FLAGS		:=	-Wall -Wextra -c -I. -std=c++11 -march=native
 
 ifdef DEBUG
 FLAGS		+= -g3 -DDEBUG

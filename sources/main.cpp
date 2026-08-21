@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 	catch (cli::cliError &ex)
 	{
 		std::cerr << basename(argv[0]) << ": " <<  ex.what() << std::endl
-				  << argv[0] << " --help to get more information." << std::endl;
+				  << "Use --help to get more information." << std::endl;
 	}
 	catch (std::exception &ex)
 	{
