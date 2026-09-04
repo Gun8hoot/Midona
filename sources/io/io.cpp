@@ -52,6 +52,7 @@ const std::fstream	&IO::openFile(std::string &filepath, std::ios::openmode mode)
 	this->_stream.open(filepath, mode);
 	if (!this->_stream.is_open())
 		throw (std::runtime_error(EOPEN_FILE + filepath));
+	this->_modes = mode;
 	return (_stream);
 }
 /*

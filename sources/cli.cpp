@@ -2,6 +2,8 @@
 #include "includes/cli.hpp"
 #include "includes/error.hpp"
 #include "includes/helper.hpp"
+#include "includes/lz4/lz4.hpp"
+#include "includes/xxhash/xxhash.hpp"
 
 #include <cctype>
 #include <cstddef>
@@ -50,7 +52,11 @@ void cli::version(void) const noexcept
  */
 void	cli::compress(void) const
 {
+	xxhash	hash;
+	u8_t	data[8] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+
 	std::cout << "Compress binary" << std::endl;
+	std::cout << "Hash : " <<  hash.xxhash32(0, data, 8) << std::endl;
 }
 /*
  * @brief: This function will called other function to encrypt the binary using AES256 encryption algorithm
@@ -64,7 +70,7 @@ void	cli::encrypt(void) const
  * @param:
  *   1. flagToCheck: The flag we want check (see includes/cli.hpp to have every flags available)
  */
-inline bool		cli::isFlagged(int flagToCheck) const
+inline bool		cli::checkActiveFlag(int flagToCheck) const
 {
 	return (this->_flags & flagToCheck ? true : false);
 }
@@ -129,8 +135,8 @@ void	cli::assignFlag(void)
 	}
 	if (this->_outfile.empty())
 		this->_outfile = this->_infile
-						+ (isFlagged(MIDONA_COMPRESS) ? "_compressed" : "")
-						+ (isFlagged(MIDONA_ENCRYPT) ? "_encrypt" : "");
+						+ (checkActiveFlag(MIDONA_COMPRESS) ? "_compressed" : "")
+						+ (checkActiveFlag(MIDONA_ENCRYPT) ? "_encrypt" : "");
 }
 /*
  * @brief: This function will check if we have gattered enough data to compress/encrypt data
@@ -141,36 +147,39 @@ void	cli::checkArguments(void)
 	std::cout << "--- DEBUG ---" << std::endl;
 	if (!this->_infile.empty()) {std::cout << "INFILE : " << this->_infile << std::endl;}
 	if (!this->_outfile.empty()) {std::cout << "OUTFILE : " << this->_outfile << std::endl;}
-	if (this->isFlagged(MIDONA_COMPRESS)) {std::cout << "COMPRESSION ACTIVATED" << std::endl;}
-	if (this->isFlagged(MIDONA_ENCRYPT)) {std::cout << "ENCRYPTION ACTIVATED" << std::endl;}
-	if (this->isFlagged(MIDONA_HELP)) {std::cout << "HELP ACTIVATED" << std::endl;}
-	if (this->isFlagged(MIDONA_VERSION)) {std::cout << "VERSION ACTIVATED" << std::endl;}
-	if (this->isFlagged(MIDONA_PROGRESS)) {std::cout << "PROGRESS ACTIVATED" << std::endl;}
+	if (this->checkActiveFlag(MIDONA_COMPRESS)) {std::cout << "COMPRESSION ACTIVATED" << std::endl;}
+	if (this->checkActiveFlag(MIDONA_ENCRYPT)) {std::cout << "ENCRYPTION ACTIVATED" << std::endl;}
+	if (this->checkActiveFlag(MIDONA_HELP)) {std::cout << "HELP ACTIVATED" << std::endl;}
+	if (this->checkActiveFlag(MIDONA_VERSION)) {std::cout << "VERSION ACTIVATED" << std::endl;}
+	if (this->checkActiveFlag(MIDONA_PROGRESS)) {std::cout << "PROGRESS ACTIVATED" << std::endl;}
 	std::cout << "--- ---- ---" << std::endl;
 	#endif
 	if (this->_infile.empty() // Throw a missing infile error if _infile is empty and -h/-v flag are not set
-		&& (!this->isFlagged(MIDONA_HELP)
-			|| !this->isFlagged(MIDONA_VERSION)))
+			&& !this->checkActiveFlag(MIDONA_HELP)
+			&& !this->checkActiveFlag(MIDONA_VERSION))
 		throw (cli::cliError(EMISSING_FILEPATH));
-	IO::checkFile(this->_infile);
-	if (!this->isFlagged(MIDONA_COMPRESS) // Check that we have at least one flag
-			&& !this->isFlagged(MIDONA_ENCRYPT)
-			&& !this->isFlagged(MIDONA_VERSION)
-			&& !this->isFlagged(MIDONA_HELP))
+	else if (!this->_infile.empty())
+	{
+		IO::checkFile(this->_infile);
+		if (!this->checkActiveFlag(MIDONA_COMPRESS) // Check that we have at least one flag
+			&& !this->checkActiveFlag(MIDONA_ENCRYPT)
+			&& !this->checkActiveFlag(MIDONA_VERSION)
+			&& !this->checkActiveFlag(MIDONA_HELP))
 		throw (cli::cliError(EMISSING_ACTION));
+	}
 }
 /*
  * @brief: This function is called when we want run the program with flag gettered before
  */
 void	cli::run(void)
 {
-	if (this->isFlagged(MIDONA_VERSION))
+	if (this->checkActiveFlag(MIDONA_VERSION))
 		return (cli::version());
-	if (this->isFlagged(MIDONA_HELP) || (!this->isFlagged(MIDONA_COMPRESS) && !this->isFlagged(MIDONA_ENCRYPT)))
+	if (this->checkActiveFlag(MIDONA_HELP) || (!this->checkActiveFlag(MIDONA_COMPRESS) && !this->checkActiveFlag(MIDONA_ENCRYPT)))
 		return (cli::help());
-	if (this->isFlagged(MIDONA_COMPRESS))
+	if (this->checkActiveFlag(MIDONA_COMPRESS))
 		cli::compress();
-	if (this->isFlagged(MIDONA_ENCRYPT))
+	if (this->checkActiveFlag(MIDONA_ENCRYPT))
 		cli::encrypt();
 	this->_io.closeFile();
 }

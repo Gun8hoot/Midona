@@ -18,6 +18,8 @@ enum	cliFlags
 	MIDONA_ENCRYPT = 1 << 3,
 	MIDONA_PROGRESS = 1 << 4,
 	MIDONA_OUTFILE = 1 << 5,
+	MIDONA_DECOMPRESS = 1 << 6,
+	MIDONA_DECRYPT = 1 << 7,
 };
 
 class	cli
@@ -33,7 +35,9 @@ class	cli
 		void		version(void) const noexcept;
 		void		compress(void) const;
 		void		encrypt(void) const;
-		bool		isFlagged(int flagToCheck) const;
+		bool		checkActiveFlag(int flagToCheck) const;
+		bool		checkValidAction(void);
+		bool		checkValidInfile(void);
 
 	public:
 		cli(int &argc, char **&argv);
