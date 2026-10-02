@@ -1,7 +1,9 @@
 
 #pragma once
 
+#include <cstddef>
 #include <fstream>
+#include <ios>
 
 class	IO
 {
@@ -14,7 +16,7 @@ class	IO
 		IO(void) noexcept;
 		~IO(void);
 
-		const std::fstream	&getStream(void) const;
+		std::fstream	&getStream(void) const;
 		const std::string	&getFilepath(void) const;
 
 		const std::fstream	&openFile(std::string &filepath, std::ios::openmode mode);

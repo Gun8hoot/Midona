@@ -2,12 +2,11 @@
 #include "includes/cli.hpp"
 #include "includes/error.hpp"
 #include "includes/helper.hpp"
-#include "includes/lz4/lz4.hpp"
-#include "includes/xxhash/xxhash.hpp"
 
 #include <cctype>
 #include <cstddef>
 #include <cstring>
+#include <fstream>
 #include <stdexcept>
 #include <unistd.h>
 #include <csignal>
@@ -29,16 +28,16 @@ cli::~cli(void) { ; }
 void cli::help(void) const noexcept
 {
 	/* https://bettercli.org/design/cli-help-page/ */
-	std::cout << "Description:" << std::endl;
-	std::cout << "    Midona " << VERSION << ", a runtime compression and encryption packer." << std::endl;
-	std::cout << "Usage: " << basename(this->_argv[0]) << " [FLAGS]... [FILE]" << std::endl;
-	std::cout << "    -c/--compress : Compress the binary" << std::endl;
-	std::cout << "    -e/--encrypt : Encrypt the binary" << std::endl;
-	std::cout << "    -b/--both : Compress and encrypt the binary" << std::endl;
-	std::cout << "    -o/--out : The location of the compressed/encrypted binary" << std::endl;
-	std::cout << "    -p/--progress : A progress bar will be display" << std::endl;
-	std::cout << "    -h/--help : Display this message" << std::endl;
-	std::cout << "    -v/--version : Display the version of the software" << std::endl;
+	std::cout	<< "Description:" << std::endl
+				<< "    Midona " << VERSION << ", a runtime compression and encryption packer." << std::endl
+				<< "Usage: " << basename(this->_argv[0]) << " [FLAGS]... [FILE]" << std::endl
+				<< "    -c/--compress : Compress the binary" << std::endl
+				<< "    -e/--encrypt : Encrypt the binary" << std::endl
+				<< "    -b/--both : Compress and encrypt the binary" << std::endl
+				<< "    -o/--out : The location of the compressed/encrypted binary" << std::endl
+				<< "    -p/--progress : A progress bar will be display" << std::endl
+				<< "    -h/--help : Display this message" << std::endl
+				<< "    -v/--version : Display the version of the software" << std::endl;
 }
 /*
  * @brief: This function display the actual version of the program
@@ -52,11 +51,7 @@ void cli::version(void) const noexcept
  */
 void	cli::compress(void) const
 {
-	xxhash	hash;
-	u8_t	data[8] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
-
 	std::cout << "Compress binary" << std::endl;
-	std::cout << "Hash : " <<  hash.xxhash32(0, data, 8) << std::endl;
 }
 /*
  * @brief: This function will called other function to encrypt the binary using AES256 encryption algorithm
@@ -167,6 +162,12 @@ void	cli::checkArguments(void)
 			&& !this->checkActiveFlag(MIDONA_HELP))
 		throw (cli::cliError(EMISSING_ACTION));
 	}
+}
+
+bool		cli::checkValidInfile(void)
+{
+	this->_io.openFile(this->_infile, std::ios::in | std::ios::binary);
+	std::fstream &ref = this->_io.getStream();
 }
 /*
  * @brief: This function is called when we want run the program with flag gettered before

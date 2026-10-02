@@ -28,7 +28,7 @@ IO::~IO(void)
 /*
  * @brief: This function return a constant reference of the stream who is currently openned
  */
-inline const std::fstream	&IO::getStream(void) const
+inline std::fstream	&IO::getStream(void) const
 {
 	return (this->_stream);
 }
