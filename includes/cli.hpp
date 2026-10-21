@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "includes/io/io.hpp"
+#include "includes/Elf.hpp"
 
 #include <exception>
 #include <iostream>
@@ -30,7 +30,7 @@ class	cli
 		uint8_t		_flags;
 		std::string	_infile;
 		std::string	_outfile;
-		IO			_io;
+		Elf			_elf;
 
 		void		version(void) const noexcept;
 		void		compress(void) const;

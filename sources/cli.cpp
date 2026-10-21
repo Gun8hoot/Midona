@@ -10,12 +10,13 @@
 #include <stdexcept>
 #include <unistd.h>
 #include <csignal>
+#include <linux/elf.h>
 
 /*
  * -- CONSTRUCTOR --
  */
 
-cli::cli(int &argc, char **&argv) : _argc(argc), _argv(argv), _flags(0), _infile(""), _outfile("") {;}
+cli::cli(int &argc, char **&argv) : _argc(argc), _argv(argv), _flags(0), _infile(""), _outfile(""), _elf () {;}
 cli::~cli(void) { ; }
 
 /*
@@ -155,7 +156,6 @@ void	cli::checkArguments(void)
 		throw (cli::cliError(EMISSING_FILEPATH));
 	else if (!this->_infile.empty())
 	{
-		IO::checkFile(this->_infile);
 		if (!this->checkActiveFlag(MIDONA_COMPRESS) // Check that we have at least one flag
 			&& !this->checkActiveFlag(MIDONA_ENCRYPT)
 			&& !this->checkActiveFlag(MIDONA_VERSION)
@@ -164,16 +164,14 @@ void	cli::checkArguments(void)
 	}
 }
 
-bool		cli::checkValidInfile(void)
-{
-	this->_io.openFile(this->_infile, std::ios::in | std::ios::binary);
-	std::fstream &ref = this->_io.getStream();
-}
 /*
  * @brief: This function is called when we want run the program with flag gettered before
  */
 void	cli::run(void)
 {
+	if (!this->_elf.open(this->_infile))
+		return;
+	Elf64_Ehdr aaa = this->_elf.getHeader();
 	if (this->checkActiveFlag(MIDONA_VERSION))
 		return (cli::version());
 	if (this->checkActiveFlag(MIDONA_HELP) || (!this->checkActiveFlag(MIDONA_COMPRESS) && !this->checkActiveFlag(MIDONA_ENCRYPT)))
@@ -182,5 +180,4 @@ void	cli::run(void)
 		cli::compress();
 	if (this->checkActiveFlag(MIDONA_ENCRYPT))
 		cli::encrypt();
-	this->_io.closeFile();
 }
