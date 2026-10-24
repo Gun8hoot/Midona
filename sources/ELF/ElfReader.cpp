@@ -13,12 +13,12 @@
  * ==========================
  */
 
-ElfReader::ElfReader(void) : _filepath(""), _stream(NULL), _validElf(false), _opened(false), _error(Elf_error::None), _header{}, _sectionHeader(), _programHeader() { ; }
-ElfReader::ElfReader(ElfReader &cpy) : _filepath(cpy._filepath), _stream(NULL), _validElf(false), _opened(false), _error(Elf_error::None), _header{}, _sectionHeader(), _programHeader()
+ElfReader::ElfReader(void) : _filepath(""), _stream(NULL), _validElf(false), _opened(false), _error(Elf_error::None), _header{}, _sectionHeader(), _programHeader(), _sectionContent(NULL) { ; }
+ElfReader::ElfReader(ElfReader &cpy) : _filepath(cpy._filepath), _stream(NULL), _validElf(false), _opened(false), _error(Elf_error::None), _header{}, _sectionHeader(), _programHeader(), _sectionContent(NULL)
 {
 	this->open(cpy._filepath);
 }
-ElfReader::ElfReader(std::string &filepath) : _filepath(filepath), _stream(NULL), _validElf(false), _opened(false), _error(Elf_error::None), _header{}, _sectionHeader(), _programHeader()
+ElfReader::ElfReader(std::string &filepath) : _filepath(filepath), _stream(NULL), _validElf(false), _opened(false), _error(Elf_error::None), _header{}, _sectionHeader(), _programHeader(), _sectionContent(NULL)
 {
 	this->open(filepath);
 }
@@ -89,7 +89,7 @@ void	ElfReader::close(void)
 /*
  * @brief: Check if the file is currently openned
  */
-bool		ElfReader::isOpen(void) const
+bool	ElfReader::isOpen(void) const
 {
 	return (this->_opened);
 }
@@ -134,6 +134,7 @@ std::vector<Elf64_Phdr>	ElfReader::getProgramHeader(void) const
 std::vector<u8_t>		*ElfReader::getSectionData(Elf64_Shdr hdr)
 {
 	std::vector<u8_t>	*data;
+
 	try
 	{
 		data = new std::vector<u8_t>(hdr.sh_size);

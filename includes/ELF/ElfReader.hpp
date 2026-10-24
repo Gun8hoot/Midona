@@ -18,8 +18,6 @@ enum class		Elf_error { None, AlreadyOpen, FailedOpen, NotELF, ReadFailed, Unsup
 #define ERR_ELF_READ "Failed to read %s"
 #define ERR_ELF_INVAL "%s is not an ELF"
 
-
-
 class ElfReader
 {
 	private:
@@ -33,6 +31,7 @@ class ElfReader
 		Elf64_Ehdr				_header;
 		std::vector<Elf64_Shdr>	_sectionHeader;
 		std::vector<Elf64_Phdr>	_programHeader;
+		std::vector<u8_t>		*_sectionContent;
 
 		/* === ELF FILE INFORMATION PARSING === */
 		bool					_parseElf(void);
@@ -43,10 +42,10 @@ class ElfReader
 	public:
 		/* === CONSTRUCTOR === */
 		ElfReader(void);
+		~ElfReader(void);
 		ElfReader(ElfReader &cpy);
 		ElfReader(std::string &filepath);
-		ElfReader	&operator=(ElfReader &cpy);
-		~ElfReader(void);
+		ElfReader				&operator=(ElfReader &cpy);
 
 		/* === I/O === */
 		bool					open(std::string &filepath);

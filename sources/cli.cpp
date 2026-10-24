@@ -159,12 +159,12 @@ void	cli::checkArguments(void)
  */
 void	cli::run(void)
 {
-	if (!this->_elf.open(this->_infile))
-		return;
 	if (this->checkActiveFlag(MIDONA_VERSION))
 		return (cli::version());
 	if (this->checkActiveFlag(MIDONA_HELP) || (!this->checkActiveFlag(MIDONA_COMPRESS) && !this->checkActiveFlag(MIDONA_ENCRYPT)))
 		return (cli::help());
+	if (!this->_elf.open(this->_infile))
+		return;
 	if (this->checkActiveFlag(MIDONA_COMPRESS))
 		cli::compress();
 	if (this->checkActiveFlag(MIDONA_ENCRYPT))

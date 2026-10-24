@@ -1,11 +1,8 @@
 
 #pragma once
 
-#include <inttypes.h>
+#include "includes/types.hpp"
 #include <string>
-
-typedef uint32_t u32_t;
-typedef uint8_t u8_t;
 
 namespace helper
 {

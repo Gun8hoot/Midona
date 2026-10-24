@@ -8,8 +8,15 @@
 	<p>I (Nathan "Gun8hoot" CLAVEL) am not in charge of the bad/good usage or the modification of my program.</p>
 	<p>I've created this program for education purposes only and it should not be used to evade any protection.</p>
 </div>
+
 <div align="center">
 	<h1>Description : </h1>
+</div>
+
+<div align="center">
+
+![Documentation](./docs)
+
 </div>
 
 Midona is a [runtime packer](https://en.wikipedia.org/wiki/Executable_compression) that can both compress and/or encrypt an linux [ELF executable](https://en.wikipedia.org/wiki/Executable_and_Linkable_Format). The decompression and decryption will be completely done at the runtime in memory without exposing the clear code of the binary on the disk. The name __Midona__ come from a game that i played when i was a child who is called [The Legend of Zelda: Twilight Princess](https://en.wikipedia.org/wiki/The_Legend_of_Zelda%3A_Twilight_Princess).  

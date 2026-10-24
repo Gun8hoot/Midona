@@ -25,7 +25,7 @@ std::string	&helper::trim(std::string &str)
 
 	if (last != size)
 		str.erase(last, size);
-	if (first != 0)
+	else if (first != 0)
 		str.erase(0, first);
 	return (str);
 }
@@ -55,7 +55,7 @@ std::string	helper::trim(const char *c_str)
 
 	if (last != size)
 		str.erase(last, size);
-	if (first != 0)
+	else if (first != 0)
 		str.erase(0, first);
 	return (str);
 }
