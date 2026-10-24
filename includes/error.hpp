@@ -8,9 +8,9 @@
 # define EINVALID_OUTFILE "Invalid outfile "
 // This error happen when the user forget to specify the file to compress/encrypt
 # define EMISSING_FILEPATH "Missing input file"
-// This error happen when the a file failed to be open. A space is at the end to specify the filename
+// This error happen when the a file failed to be open. A space is at the end to specify the filepath
 # define EOPEN_FILE "Failed to open "
-// This error happen when the a file failed to be close. A space is at the end to specify the filename
+// This error happen when the a file failed to be close. A space is at the end to specify the filepath
 # define ECLOSE_FILE "Failed to close "
 // This error happen when the input file is a directory symlink, socket, ...
 #define EREG_FILE "The input file is not a regular file"

@@ -1,12 +1,9 @@
 #pragma once
 
-#include <cstdint>
+#include "includes/types.hpp"
 #include <cstddef>
 #include <vector>
 
-typedef uint8_t  u8_t;
-typedef uint16_t u16_t;
-typedef uint32_t u32_t;
 
 /* ---- LZ4 block-format constants ---- */
 static const int  LZ4_MINMATCH      = 4;

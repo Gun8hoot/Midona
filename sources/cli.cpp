@@ -1,5 +1,6 @@
 
 #include "includes/cli.hpp"
+#include "includes/ELF/ElfReader.hpp"
 #include "includes/error.hpp"
 #include "includes/helper.hpp"
 
@@ -139,17 +140,6 @@ void	cli::assignFlag(void)
  */
 void	cli::checkArguments(void)
 {
-	#ifdef DEBUG
-	std::cout << "--- DEBUG ---" << std::endl;
-	if (!this->_infile.empty()) {std::cout << "INFILE : " << this->_infile << std::endl;}
-	if (!this->_outfile.empty()) {std::cout << "OUTFILE : " << this->_outfile << std::endl;}
-	if (this->checkActiveFlag(MIDONA_COMPRESS)) {std::cout << "COMPRESSION ACTIVATED" << std::endl;}
-	if (this->checkActiveFlag(MIDONA_ENCRYPT)) {std::cout << "ENCRYPTION ACTIVATED" << std::endl;}
-	if (this->checkActiveFlag(MIDONA_HELP)) {std::cout << "HELP ACTIVATED" << std::endl;}
-	if (this->checkActiveFlag(MIDONA_VERSION)) {std::cout << "VERSION ACTIVATED" << std::endl;}
-	if (this->checkActiveFlag(MIDONA_PROGRESS)) {std::cout << "PROGRESS ACTIVATED" << std::endl;}
-	std::cout << "--- ---- ---" << std::endl;
-	#endif
 	if (this->_infile.empty() // Throw a missing infile error if _infile is empty and -h/-v flag are not set
 			&& !this->checkActiveFlag(MIDONA_HELP)
 			&& !this->checkActiveFlag(MIDONA_VERSION))
@@ -171,7 +161,6 @@ void	cli::run(void)
 {
 	if (!this->_elf.open(this->_infile))
 		return;
-	Elf64_Ehdr aaa = this->_elf.getHeader();
 	if (this->checkActiveFlag(MIDONA_VERSION))
 		return (cli::version());
 	if (this->checkActiveFlag(MIDONA_HELP) || (!this->checkActiveFlag(MIDONA_COMPRESS) && !this->checkActiveFlag(MIDONA_ENCRYPT)))

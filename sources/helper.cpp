@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <pwd.h>
+#include <sys/random.h>
 
 /*
  * @brief: This function remove white space at the beginning and the end of the string
@@ -83,4 +84,16 @@ std::string	&helper::expand(std::string &str)
 		str = "/home/" + username + str;
 	}
 	return (str);
+}
+
+char	*helper::genPassword(std::size_t size)
+{
+	char	*password = new char[size];
+
+	if (getrandom(password, size, 0) == -1)
+	{
+		delete []password;
+		return (NULL);
+	}
+	return (password);
 }

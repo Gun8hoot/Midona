@@ -38,7 +38,7 @@ _start:
 	; ptr_init_fn = pointer to the addresse of the fini function __attribute__((destructor)) // Calculate with the decompressed ELF file
 	; rtld_fini = pointer to the terminason function of the dynamic linker, 0 when static linked
 	; stack_end = highest address of the stack, define the end of the stack
-	mov rdi, [esp + 0]			; Get argc
-	mov rsi, [esp + 4]			; Get argv
+	mov edi, [esp + 0]			; Get argc
+	mov esi, [esp + 4]			; Get argv
 	call __libc_start_main
 %endif
