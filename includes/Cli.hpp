@@ -16,13 +16,13 @@ enum	cliFlags
 	MIDONA_HELP = 1 << 1,
 	MIDONA_COMPRESS = 1 << 2,
 	MIDONA_ENCRYPT = 1 << 3,
-	MIDONA_PROGRESS = 1 << 4,
+	MIDONA_SILENT = 1 << 4,
 	MIDONA_OUTFILE = 1 << 5,
 	MIDONA_DECOMPRESS = 1 << 6,
 	MIDONA_DECRYPT = 1 << 7,
 };
 
-class	cli
+class	Cli
 {
 	private:
 		int			&_argc;
@@ -30,7 +30,7 @@ class	cli
 		uint8_t		_flags;
 		std::string	_infile;
 		std::string	_outfile;
-		ElfReader	_elf;
+		ElfReader	*_elf_reader;
 
 		void		version(void) const noexcept;
 		void		compress(void) const;
@@ -40,8 +40,8 @@ class	cli
 		bool		checkValidInfile(void);
 
 	public:
-		cli(int &argc, char **&argv);
-		~cli(void);
+		Cli(int &argc, char **&argv);
+		~Cli(void);
 		class cliError : public std::exception
 		{
 			private:

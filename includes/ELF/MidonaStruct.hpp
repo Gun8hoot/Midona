@@ -2,6 +2,19 @@
 #pragma once
 
 #include "includes/types.hpp"
+#include <vector>
+
+template <typename t>
+class Section
+{
+	private:
+		std::vector<t>	_vec;
+		std::size_t		_nb_section;
+	public:
+		Section(void);
+		Section(Section &cpy);
+		Section(std::size_t nb_section);
+};
 
 typedef struct s_midona_key
 {

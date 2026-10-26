@@ -1,5 +1,5 @@
 
-#include "includes/cli.hpp"
+#include "includes/Cli.hpp"
 #include "includes/ELF/ElfReader.hpp"
 #include "includes/error.hpp"
 #include "includes/helper.hpp"
@@ -11,23 +11,31 @@
 #include <stdexcept>
 #include <unistd.h>
 #include <csignal>
-#include <linux/elf.h>
 
 /*
- * -- CONSTRUCTOR --
+ * ==========================
+ * = CONSTRUCTOR/DESTRUCTOR =
+ * ==========================
  */
 
-cli::cli(int &argc, char **&argv) : _argc(argc), _argv(argv), _flags(0), _infile(""), _outfile(""), _elf () {;}
-cli::~cli(void) { ; }
+Cli::Cli(int &argc, char **&argv) : _argc(argc), _argv(argv), _flags(0), _infile(""), _outfile(""), _elf_reader () {;}
+Cli::~Cli(void)
+{
+	if (this->_elf_reader != nullptr)
+		delete this->_elf_reader;
+}
 
 /*
- * -- FLAGS --
+ * =========
+ * = FLAGS =
+ * =========
  */
 
 /*
- * @brief: This function is show every parameter available for the program
+ * @brief: This function is show the help message who explain what arguments should
+ * the user provided to use the CLI
  */
-void cli::help(void) const noexcept
+void Cli::help(void) const noexcept
 {
 	/* https://bettercli.org/design/cli-help-page/ */
 	std::cout	<< "Description:" << std::endl
@@ -37,50 +45,44 @@ void cli::help(void) const noexcept
 				<< "    -e/--encrypt : Encrypt the binary" << std::endl
 				<< "    -b/--both : Compress and encrypt the binary" << std::endl
 				<< "    -o/--out : The location of the compressed/encrypted binary" << std::endl
-				<< "    -p/--progress : A progress bar will be display" << std::endl
+				<< "    -s/--silent : Dont display any information during the program execution" << std::endl
 				<< "    -h/--help : Display this message" << std::endl
 				<< "    -v/--version : Display the version of the software" << std::endl;
 }
 /*
- * @brief: This function display the actual version of the program
+ * @brief: This function display the version of the program
  */
-void cli::version(void) const noexcept
+void Cli::version(void) const noexcept
 {
-	std::cout << "Midona version: " << VERSION << std::endl; /* NEED TO FIND AN ANOTHER WAY TO CHECK VERSION */
+	std::cout << "Midona version: " << VERSION << std::endl;
 }
 /*
- * @brief: This function will called other function to compress the binary using lz4 compression algorithm
+ * @brief: Wrapper who do the compression of some section
  */
-void	cli::compress(void) const
+void	Cli::compress(void) const
 {
 	std::cout << "Compress binary" << std::endl;
 }
 /*
- * @brief: This function will called other function to encrypt the binary using AES256 encryption algorithm
+ * @brief: Wrapper who do the encryption of some section
  */
-void	cli::encrypt(void) const
+void	Cli::encrypt(void) const
 {
 	std::cout << "Encrypt binary" << std::endl;
 }
 /*
  * @brief: This function check if a flag is enable
- * @param:
- *   1. flagToCheck: The flag we want check (see includes/cli.hpp to have every flags available)
+ * @param flagToCheck: The flag we want check if he is active
  */
-inline bool		cli::checkActiveFlag(int flagToCheck) const
+inline bool		Cli::checkActiveFlag(int flagToCheck) const
 {
 	return (this->_flags & flagToCheck ? true : false);
 }
 
 /*
- * -- OTHER METHODES --
+ * @brief: This function will set correct flag bits using given arguments in argv
  */
-
-/*
- * @brief: This function will look every arguments put in argv and
- *         activate their respective flags
- */
-void	cli::assignFlag(void)
+void	Cli::assignFlag(void)
 {
 	std::string currentArguments;
 	std::string	nextArguments;
@@ -109,9 +111,9 @@ void	cli::assignFlag(void)
 		{
 			this->_flags |= MIDONA_VERSION;
 		}
-		else if (currentArguments == "-p" || currentArguments == "--progress")
+		else if (currentArguments == "-s" || currentArguments == "--silent")
 		{
-			this->_flags |= MIDONA_PROGRESS;
+			this->_flags |= MIDONA_SILENT;
 		}
 		else if (currentArguments == "-o" || currentArguments == "--out")
 		{
@@ -128,45 +130,58 @@ void	cli::assignFlag(void)
 			this->_infile = currentArguments;
 		}
 		else
-			throw (cli::cliError(EUNKNOWN_FLAG + std::string(this->_argv[i])));
+			throw (Cli::cliError(EUNKNOWN_FLAG + std::string(this->_argv[i])));
 	}
 	if (this->_outfile.empty())
-		this->_outfile = this->_infile
-						+ (checkActiveFlag(MIDONA_COMPRESS) ? "_compressed" : "")
-						+ (checkActiveFlag(MIDONA_ENCRYPT) ? "_encrypt" : "");
+		this->_outfile =
+			this->_infile + (checkActiveFlag(MIDONA_COMPRESS) || checkActiveFlag(MIDONA_ENCRYPT) ? "_packed" : "");
 }
 /*
  * @brief: This function will check if we have gattered enough data to compress/encrypt data
  */
-void	cli::checkArguments(void)
+void	Cli::checkArguments(void)
 {
 	if (this->_infile.empty() // Throw a missing infile error if _infile is empty and -h/-v flag are not set
 			&& !this->checkActiveFlag(MIDONA_HELP)
 			&& !this->checkActiveFlag(MIDONA_VERSION))
-		throw (cli::cliError(EMISSING_FILEPATH));
-	else if (!this->_infile.empty())
+		throw (Cli::cliError(EMISSING_FILEPATH));
+	// else if (this->_infile == this->_argv[0] || this->_outfile == this->_argv[0])
+		// throw (std::runtime_error("You cannot overwrite packer own binary."));
+	else if ((this->_infile == this->_outfile) && !this->checkActiveFlag(MIDONA_SILENT))
+	{
+		std::string usr;
+		std::cout << "\x1b[33m[?] The input and output file are the same, are you sure to continue ? (Y/n)\x1b[0m : ";
+		std::cin >> usr;
+		if (usr == "N" || usr == "n")
+			throw (std::runtime_error("Abording ..."));
+	}
+	if (!this->_infile.empty())
 	{
 		if (!this->checkActiveFlag(MIDONA_COMPRESS) // Check that we have at least one flag
-			&& !this->checkActiveFlag(MIDONA_ENCRYPT)
-			&& !this->checkActiveFlag(MIDONA_VERSION)
-			&& !this->checkActiveFlag(MIDONA_HELP))
-		throw (cli::cliError(EMISSING_ACTION));
+				&& !this->checkActiveFlag(MIDONA_ENCRYPT)
+				&& !this->checkActiveFlag(MIDONA_VERSION)
+				&& !this->checkActiveFlag(MIDONA_HELP))
+			throw (Cli::cliError(EMISSING_ACTION));
 	}
 }
 
 /*
  * @brief: This function is called when we want run the program with flag gettered before
  */
-void	cli::run(void)
+void	Cli::run(void)
 {
 	if (this->checkActiveFlag(MIDONA_VERSION))
-		return (cli::version());
+		return (Cli::version());
 	if (this->checkActiveFlag(MIDONA_HELP) || (!this->checkActiveFlag(MIDONA_COMPRESS) && !this->checkActiveFlag(MIDONA_ENCRYPT)))
-		return (cli::help());
-	if (!this->_elf.open(this->_infile))
-		return;
+		return (Cli::help());
+
+	this->_elf_reader = new (std::nothrow) ElfReader(this->checkActiveFlag(MIDONA_SILENT));
+	if (this->_elf_reader == nullptr)
+		throw (std::runtime_error("Failed to allocated memory for the ElfReader class!"));
+	this->_elf_reader->open(this->_infile);
+
 	if (this->checkActiveFlag(MIDONA_COMPRESS))
-		cli::compress();
+		this->compress();
 	if (this->checkActiveFlag(MIDONA_ENCRYPT))
-		cli::encrypt();
+		this->encrypt();
 }

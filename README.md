@@ -53,11 +53,12 @@ make clean
 	<h1>Roadmap : </h1>
 </div>
 
-Done at : ~3%
+Done at : ~7%
 
 - [ ] : Create the best program i can do with the maximum of quality
 - [x] : Parse arguments with their corresponding flags
 	- [x] : (optional) Add -o flag to know where the compressed/encrypted executable should be placed/named
+- [ ] : Being able create a new ELF file using the original ELF headers and section
 - [ ] : Being able to compress data
 	- [x] : Choose a good compression algorithm
 	- [ ] : Implement the algorithm
@@ -70,7 +71,8 @@ Done at : ~3%
 	- [ ] Decompression ? 
 	- [ ] Decryption ? 
 - [ ] : Being able to execute the decompressed/decrypted stub on the memory
-- [ ] : (optional) Change the signature every time the compressed binary is executed
+- [ ] : (optional) Change the signature every time the compressed binary is executed 
+	- [ ] Add a CLI flag to activate that 
 - [ ] : (optional) Adapt the stub to support both 64 and 32 bits
 - [ ] : (optional) Add more CLI flags to add more control of how the program is compress/encrypted
 
