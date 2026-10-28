@@ -1,8 +1,11 @@
 
 #include "includes/Cli.hpp"
+#include "includes/ELF/ElfBuilder.hpp"
 #include "includes/ELF/ElfReader.hpp"
+#include "includes/ELF/MidonaStruct.hpp"
 #include "includes/error.hpp"
 #include "includes/helper.hpp"
+#include "includes/midona.hpp"
 
 #include <cctype>
 #include <cstddef>
@@ -18,11 +21,13 @@
  * ==========================
  */
 
-Cli::Cli(int &argc, char **&argv) : _argc(argc), _argv(argv), _flags(0), _infile(""), _outfile(""), _elf_reader () {;}
+Cli::Cli(int &argc, char **&argv) : _argc(argc), _argv(argv), _flags(0), _infile(""), _outfile(""), _elf_reader(nullptr), _elf_builder(nullptr) {;}
 Cli::~Cli(void)
 {
 	if (this->_elf_reader != nullptr)
 		delete this->_elf_reader;
+	if (this->_elf_builder != nullptr)
+		delete this->_elf_builder;
 }
 
 /*
@@ -117,9 +122,9 @@ void	Cli::assignFlag(void)
 		}
 		else if (currentArguments == "-o" || currentArguments == "--out")
 		{
+			if (!_argv[i + 1])
+				throw (MidonaRuntimeError("Missing output file"));
 			nextArguments = _argv[i + 1];
-			if (nextArguments.rfind("-", 0) == 0)
-				throw (std::runtime_error(EINVALID_OUTFILE + nextArguments));
 			this->_flags |= MIDONA_OUTFILE;
 			this->_outfile = helper::expand(helper::trim(nextArguments));
 			i++;
@@ -145,15 +150,13 @@ void	Cli::checkArguments(void)
 			&& !this->checkActiveFlag(MIDONA_HELP)
 			&& !this->checkActiveFlag(MIDONA_VERSION))
 		throw (Cli::cliError(EMISSING_FILEPATH));
-	// else if (this->_infile == this->_argv[0] || this->_outfile == this->_argv[0])
-		// throw (std::runtime_error("You cannot overwrite packer own binary."));
-	else if ((this->_infile == this->_outfile) && !this->checkActiveFlag(MIDONA_SILENT))
+	else if (!this->_infile.empty() && (this->_infile == this->_outfile) && !this->checkActiveFlag(MIDONA_SILENT))
 	{
 		std::string usr;
 		std::cout << "\x1b[33m[?] The input and output file are the same, are you sure to continue ? (Y/n)\x1b[0m : ";
 		std::cin >> usr;
 		if (usr == "N" || usr == "n")
-			throw (std::runtime_error("Abording ..."));
+			throw (MidonaRuntimeError("Abording ..."));
 	}
 	if (!this->_infile.empty())
 	{
@@ -177,11 +180,19 @@ void	Cli::run(void)
 
 	this->_elf_reader = new (std::nothrow) ElfReader(this->checkActiveFlag(MIDONA_SILENT));
 	if (this->_elf_reader == nullptr)
-		throw (std::runtime_error("Failed to allocated memory for the ElfReader class!"));
+		throw (MidonaRuntimeError(EALLOC_ERROR, "ElfReader class"));
 	this->_elf_reader->open(this->_infile);
+
+	this->_elf_builder = new (std::nothrow) ElfBuilder();
+	if (this->_elf_builder == nullptr)
+		throw (MidonaRuntimeError(EALLOC_ERROR, "ElfBuilder class"));
+	this->_elf_builder->copyReaderData(*this->_elf_reader);
+	this->_elf_builder->createFile(this->_outfile);
 
 	if (this->checkActiveFlag(MIDONA_COMPRESS))
 		this->compress();
 	if (this->checkActiveFlag(MIDONA_ENCRYPT))
 		this->encrypt();
+	if (!this->checkActiveFlag(MIDONA_SILENT))
+		std::cout << "\x1b[32m[!] Successfully packed " << this->_outfile << " (" << this->_elf_reader->getFilesize() << "/" << this->_elf_builder->getFilesize() <<  " bytes)\x1b[0m" << std::endl;
 }

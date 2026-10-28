@@ -1,5 +1,6 @@
 
 #include "includes/Cli.hpp"
+#include "includes/ELF/MidonaStruct.hpp"
 
 #include <cstring>
 #include <exception>

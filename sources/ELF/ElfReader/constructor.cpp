@@ -6,8 +6,8 @@ ElfReader::ElfReader(void) :
 		_stream(nullptr),
 		_validElf(false),
 		_opened(false),
+		_filesize(0),
 		_silent(false),
-		_error(Elf_error::None),
 		_header{},
 		_sectionHeader(),
 		_programHeader()
@@ -18,8 +18,8 @@ ElfReader::ElfReader(ElfReader &cpy) :
 		_stream(nullptr),
 		_validElf(false),
 		_opened(false),
+		_filesize(0),
 		_silent(cpy._silent),
-		_error(Elf_error::None),
 		_header{},
 		_sectionHeader(),
 		_programHeader()
@@ -32,8 +32,8 @@ ElfReader::ElfReader(std::string &filepath) :
 		_stream(nullptr),
 		_validElf(false),
 		_opened(false),
+		_filesize(0),
 		_silent(false),
-		_error(Elf_error::None),
 		_header{},
 		_sectionHeader(),
 		_programHeader()
@@ -45,8 +45,8 @@ ElfReader::ElfReader(bool shouldSilent) :
 		_stream(nullptr),
 		_validElf(false),
 		_opened(false),
+		_filesize(0),
 		_silent(shouldSilent),
-		_error(Elf_error::None),
 		_header{},
 		_sectionHeader(),
 		_programHeader()
@@ -56,8 +56,8 @@ ElfReader::ElfReader(std::string &filepath, bool shouldSilent) :
 		_stream(nullptr),
 		_validElf(false),
 		_opened(false),
+		_filesize(0),
 		_silent(shouldSilent),
-		_error(Elf_error::None),
 		_header{},
 		_sectionHeader(),
 		_programHeader()

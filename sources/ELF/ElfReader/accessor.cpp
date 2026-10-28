@@ -1,9 +1,10 @@
 
 #include "includes/ELF/ElfReader.hpp"
+#include <linux/elf.h>
 
 /*
  * @brief: This function return the path of the path
- * @return: The path to the file
+ * @return: The path of the file
  */
 std::string	ElfReader::getFilepath(void) const
 {
@@ -32,4 +33,9 @@ std::vector<Elf64_Shdr>	ElfReader::getSectionHeader(void) const
 std::vector<Elf64_Phdr>	ElfReader::getProgramHeader(void) const
 {
 	return (this->_programHeader);
+}
+
+std::vector<Elf64_Nhdr>	ElfReader::getNoteHeader(void) const
+{
+	return (this->_noteHeader);
 }

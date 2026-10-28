@@ -1,5 +1,7 @@
 
 #include "includes/ELF/ElfReader.hpp"
+#include "includes/error.hpp"
+#include "includes/midona.hpp"
 #include <exception>
 
 /*
@@ -8,35 +10,36 @@
  */
 void	ElfReader::open(std::string &filepath)
 {
-	this->_error = Elf_error::None;
-
 	/* --- FILE PREPARATION --- */
 	if (isOpen())
 		this->close();
 	this->_stream = new (std::nothrow) std::ifstream(filepath, std::ios::in | std::ios::binary);
 	if (this->_stream == nullptr)
-		throw (ElfReader::io_error("Failed failed to allocated memory for std::ifstream", this->_error, Elf_error::FailedAlloc));
+		throw (MidonaRuntimeError(EALLOC_ERROR, "ElfRead file stream"));
 	if (!this->_stream->is_open())
-		throw (ElfReader::io_error("Failed to open file " + filepath, this->_error, Elf_error::FailedOpen));
+		throw (MidonaRuntimeError(EOPEN_FILE, this->_filepath));
+	this->_opened = true;
 
 	/* --- ELF PARSING --- */
 	this->_parseElfHeader();
 	this->_parseElfSectionHeader();
 	this->_parseElfProgramHeader();
 	this->_parseElfNoteHeader();
-	this->_opened = true;
+	this->_filesize = this->_stream->tellg();
 }
 
 /*
  * @brief: Properly close the opened file and release the memory allocated for the stream
  */
-
 void	ElfReader::close(void)
 {
 	if (this->_opened)
 		this->_stream->close();
 	if (this->_stream)
+	{
 		delete this->_stream;
+		this->_stream = nullptr;
+	}
 }
 
 /*
@@ -56,15 +59,18 @@ bool	ElfReader::isOpen(void) const
  */
 bool	ElfReader::readAt(u64_t offset, void *buf, size_t len)
 {
+	if (!buf || !this->_opened)
+		return (false);
 	this->_stream->seekg(offset, std::ios::beg);
 	if (this->_stream->fail())
-		goto failed;
+		return(false);
 	this->_stream->read(reinterpret_cast<char *>(buf), len);
 	if (this->_stream->gcount() != static_cast<std::streamsize>(len))
-		goto failed;
-	return (true);
-
-	failed:
-		this->_error = Elf_error::ReadFailed;
 		return(false);
+	return (true);
+}
+
+std::size_t	ElfReader::getFilesize(void) const
+{
+	return (this->_filesize);
 }

@@ -6,7 +6,6 @@ section .text
 global _start
 
 _start:
-
 	%ifdef decryption
 		; Do decryption things here
 	%endif

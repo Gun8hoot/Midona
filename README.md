@@ -75,6 +75,7 @@ Done at : ~7%
 	- [ ] Add a CLI flag to activate that 
 - [ ] : (optional) Adapt the stub to support both 64 and 32 bits
 - [ ] : (optional) Add more CLI flags to add more control of how the program is compress/encrypted
+- [ ] : (optional) Add stat flag who display statistics about the compression/encryption/outfile at the end of the program
 
 <div align="center">
 	<h1>Technical description : </h1>

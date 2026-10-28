@@ -2,12 +2,15 @@
 #include "includes/ELF/ElfBuilder.hpp"
 #include <cstring>
 
+/*
+ * @brief: This function copy every ELF data from the ELF Reader class in the builder class
+ */
 void	ElfBuilder::copyReaderData(void)
 {
 	this->_ElfHeader = this->_elfReader->getElfHeader();
 	this->_SectionHeader = this->_elfReader->getSectionHeader();
 	this->_ProgramHeader = this->_elfReader->getProgramHeader();
-	// this->_NoteHeader = this->_elfReader->get();
+	this->_NoteHeader = this->_elfReader->getNoteHeader();
 }
 
 void	ElfBuilder::copyReaderData(ElfReader &reader)
@@ -51,14 +54,31 @@ void	ElfBuilder::removeSectionHeader(const Elf64_Shdr &section_header)
 }
 void	ElfBuilder::removeProgramHeader(const Elf64_Phdr &section_header)
 {
+	auto it = this->_ProgramHeader.begin();
+	auto ite = this->_ProgramHeader.end();
 
+	while (it != ite)
+	{
+		if (std::memcmp(&*it, &section_header, sizeof(Elf64_Phdr)) == 0)
+		{
+			this->_ProgramHeader.erase(it);
+			break;
+		}
+		++it;
+	}
 }
 void	ElfBuilder::removeNoteHeader(const Elf64_Nhdr &section_header)
 {
+	auto it = this->_NoteHeader.begin();
+	auto ite = this->_NoteHeader.end();
 
-}
-
-bool	ElfBuilder::createFile(std::string &filename)
-{
-	return (true);
+	while (it != ite)
+	{
+		if (std::memcmp(&*it, &section_header, sizeof(Elf64_Nhdr)) == 0)
+		{
+			this->_NoteHeader.erase(it);
+			break;
+		}
+		++it;
+	}
 }

@@ -4,22 +4,17 @@
 /*
  * FILE OPERATION ERROR
  */
-// This error happen when the user put a outfile that look like a flag
-# define EINVALID_OUTFILE "Invalid outfile "
-// This error happen when the user forget to specify the file to compress/encrypt
+
+# define EINVALID_OUTFILE "The file %s is invalid"
 # define EMISSING_FILEPATH "Missing input file"
-// This error happen when the a file failed to be open. A space is at the end to specify the filepath
-# define EOPEN_FILE "Failed to open "
-// This error happen when the a file failed to be close. A space is at the end to specify the filepath
-# define ECLOSE_FILE "Failed to close "
-// This error happen when the input file is a directory symlink, socket, ...
-#define EREG_FILE "The input file is not a regular file"
-// This error happen if lstat failed to open the file
-#define ELSTAT_FAILED "Failed to open file property "
-// This error happen if the input file doesnt exist
-#define EDONT_EXIST "The input file doesnt exist"
-// This error happen if the user doesnt have read permission on the file
-#define EREAD_ERROR "The input file doesnt have read permission"
+# define EOPEN_FILE "Failed to open %s"
+# define ECLOSE_FILE "Failed to close %s"
+#define EREG_FILE "The file %s is not a regular file"
+#define ELSTAT_FAILED "Failed to get %s properties"
+#define EDONT_EXIST "The file %s doesnt exist"
+#define EREAD_ERROR "Failed to read on file %s"
+#define EWRITE_ERROR "Failed to write on file %s"
+#define EALLOC_ERROR "Failed to allocated memory for %s"
 
 /*
  * ARGUMENTS ERROR

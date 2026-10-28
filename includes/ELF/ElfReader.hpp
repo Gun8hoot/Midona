@@ -2,6 +2,8 @@
 #pragma once
 
 #include "includes/types.hpp"
+#include "includes/midona.hpp"
+#include <cstddef>
 #include <linux/elf.h>
 #include <fstream>
 #include <iostream>
@@ -14,8 +16,6 @@
 #include <sys/types.h>
 #include <vector>
 
-enum class		Elf_error { None, AlreadyOpen, FailedOpen, NotELF, ReadFailed, Unsupported, FailedAlloc, InvalidElf };
-
 #define ERR_ELF_READ "Failed to read %s"
 #define ERR_ELF_INVAL "%s is not an ELF"
 
@@ -27,8 +27,8 @@ class ElfReader
 		std::ifstream			*_stream;
 		bool					_validElf;
 		bool					_opened;
+		std::size_t				_filesize;
 		bool					_silent;
-		Elf_error				_error;
 
 		/* === ELF DATA === */
 		Elf64_Ehdr				_header;
@@ -59,25 +59,12 @@ class ElfReader
 		bool					isOpen(void) const;
 		bool					isELF(void) const;
 		bool					readAt(u64_t offset, void *buf, size_t len);
-		Elf_error				error(void) const;
-
-		/* === none === */
-		class					io_error : public std::exception
-		{
-			private:
-				std::string _msg;
-				Elf_error	&_err;
-			public:
-				io_error(std::string msg, Elf_error &err, Elf_error code) : _msg(msg), _err(err) { _err = code; }
-				const char *what(void) const noexcept
-				{
-					return (_msg.c_str());
-				}
-		};
+		std::size_t				getFilesize(void) const;
 
 		/* === sources/ELF/getter.cpp === */
 		std::string				getFilepath(void) const;
 		Elf64_Ehdr				getElfHeader(void) const;
 		std::vector<Elf64_Shdr>	getSectionHeader(void) const;
 		std::vector<Elf64_Phdr>	getProgramHeader(void) const;
+		std::vector<Elf64_Nhdr>	getNoteHeader(void) const;
 };

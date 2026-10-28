@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "includes/ELF/ElfBuilder.hpp"
 #include "includes/ELF/ElfReader.hpp"
 
 #include <exception>
@@ -31,6 +32,7 @@ class	Cli
 		std::string	_infile;
 		std::string	_outfile;
 		ElfReader	*_elf_reader;
+		ElfBuilder	*_elf_builder;
 
 		void		version(void) const noexcept;
 		void		compress(void) const;
