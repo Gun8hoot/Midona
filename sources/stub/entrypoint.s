@@ -3,9 +3,19 @@
 BITS 64
 
 section .text
-global _start
+global _stub_start
 
-_start:
+_stub_start:
+	push rsi
+	push rdi
+	push rax
+
+	mov rax, 1
+	mov rdi, 0x41
+	mov rsi, 1
+
+	syscall
+
 	%ifdef decryption
 		; Do decryption things here
 	%endif
@@ -13,6 +23,10 @@ _start:
 		; Do decompression things here
 	%endif
 
+	pop rax
+	pop rdi
+	pop rsi
 	; Note : Dont forget to correctly restore the stack
-	call _start
+	db 0xE9
+	dd 0x ; jump to the original _start location, patched during the build time
 %endif

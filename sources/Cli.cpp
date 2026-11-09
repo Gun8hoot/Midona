@@ -6,6 +6,7 @@
 #include "includes/error.hpp"
 #include "includes/helper.hpp"
 #include "includes/midona.hpp"
+#include "includes/types.hpp"
 
 #include <cctype>
 #include <cstddef>
@@ -14,6 +15,36 @@
 #include <stdexcept>
 #include <unistd.h>
 #include <csignal>
+#include <vector>
+
+#include <vector>
+#include <cstdint>
+#include <cstring>
+
+std::vector<uint8_t>    make_hello_stub(void)
+{
+    static const uint8_t bytes[] = {
+        0x52,                                            // push rdx
+        0x57,                                            // push rdi
+        0x56,                                            // push rsi
+        0x48, 0xC7, 0xC0, 0x01, 0x00, 0x00, 0x00,        // mov rax, 1  (SYS_write)
+        0x48, 0xC7, 0xC7, 0x01, 0x00, 0x00, 0x00,        // mov rdi, 1  (stdout)
+        0x48, 0x8D, 0x35, 0x11, 0x00, 0x00, 0x00,        // lea rsi, [rip+0x11] -> msg @ +41
+        0x48, 0xC7, 0xC2, 0x17, 0x00, 0x00, 0x00,        // mov rdx, 23
+        0x0F, 0x05,                                      // syscall
+        0x5E,                                            // pop rsi
+        0x5F,                                            // pop rdi
+        0x5A,                                            // pop rdx
+        0xE9, 0x00, 0x00, 0x00, 0x00,                    // jmp rel32  (patched)
+        0x68,0x65,0x6C,0x6C,0x6F,0x20,                   // "hello "
+        0x66,0x72,0x6F,0x6D,0x20,                        // "from "
+        0x65,0x6E,0x74,0x72,0x79,0x20,                   // "entry "
+        0x70,0x6F,0x69,0x6E,0x74,0x0A                    // "point\n"
+    };
+    return std::vector<uint8_t>(bytes, bytes + sizeof(bytes));
+}
+
+constexpr std::size_t JMP_REL32_OFFSET = 36;   // offset of the E9 inside the stub
 
 /*
  * ==========================
@@ -178,15 +209,27 @@ void	Cli::run(void)
 	if (this->checkActiveFlag(MIDONA_HELP) || (!this->checkActiveFlag(MIDONA_COMPRESS) && !this->checkActiveFlag(MIDONA_ENCRYPT)))
 		return (Cli::help());
 
-	this->_elf_reader = new (std::nothrow) ElfReader(this->checkActiveFlag(MIDONA_SILENT));
+	this->_elf_reader = new (std::nothrow) ElfReader(this->_infile, this->checkActiveFlag(MIDONA_SILENT));
 	if (this->_elf_reader == nullptr)
 		throw (MidonaRuntimeError(EALLOC_ERROR, "ElfReader class"));
-	this->_elf_reader->open(this->_infile);
 
-	this->_elf_builder = new (std::nothrow) ElfBuilder();
+	this->_elf_builder = new (std::nothrow) ElfBuilder(*this->_elf_reader);
 	if (this->_elf_builder == nullptr)
 		throw (MidonaRuntimeError(EALLOC_ERROR, "ElfBuilder class"));
-	this->_elf_builder->copyReaderData(*this->_elf_reader);
+
+	Elf64_Shdr packed = {};
+	packed.sh_type      = SHT_PROGBITS;
+	packed.sh_flags     = SHF_ALLOC | SHF_EXECINSTR;
+	packed.sh_addralign = 16;
+	packed.sh_name      = 0;
+
+	std::vector<u8_t> data = make_hello_stub();
+	std::size_t idx = this->_elf_builder->getSectionData().size();  // = 0 if builder is fresh
+	this->_elf_builder->addSection(packed, data);
+
+	this->_elf_builder->setEntryPointToSection(idx, /*offset_in_section=*/0,
+                                   /*jmp_rel32_offset=*/JMP_REL32_OFFSET);
+
 	this->_elf_builder->createFile(this->_outfile);
 
 	if (this->checkActiveFlag(MIDONA_COMPRESS))
